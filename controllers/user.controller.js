@@ -45,7 +45,6 @@ const userCtrl = {
             let data = await pool.query(`SELECT * FROM ${table_name} WHERE id=${id}`)
             data = data?.result[0];
             let ip_list = await pool.query(`SELECT * FROM permit_ips WHERE user_id=${id} AND is_delete=0`);
-            console.log(ip_list?.result);
             data = {
                 ...data,
                 ip_list: ip_list?.result
@@ -64,7 +63,7 @@ const userCtrl = {
             const decode_user = checkLevel(req.cookies.token, 0);
 
             let {
-                user_name, user_pw, nickname, level = 0, phone_num, profile_img, note, ip_list
+                user_name, user_pw, nickname, level = 0, phone_num, profile_img, note, ip_list = []
             } = req.body;
             if (level > decode_user?.level) {
                 return lowLevelException(req, res);
@@ -83,8 +82,20 @@ const userCtrl = {
             obj = { ...obj, ...files };
             await db.beginTransaction();
             let result = await insertQuery(`${table_name}`, obj);
-            console.log(result)
+            let user_id = result?.result?.insertId;
+            let result_ip_list = [];
+            for (var i = 0; i < ip_list.length; i++) {
+                if (ip_list[i]?.is_delete != 1) {
+                    result_ip_list.push([
+                        user_id,
+                        ip_list[i]?.ip
+                    ])
+                }
 
+            }
+            if (result_ip_list.length > 0) {
+                let result2 = await pool.query(`INSERT INTO permit_ips (user_id, ip) VALUES ?`, [result_ip_list]);
+            }
             await db.commit();
             return response(req, res, 100, "success", {})
         } catch (err) {
@@ -100,7 +111,7 @@ const userCtrl = {
             let is_manager = await checkIsManagerUrl(req);
             const decode_user = checkLevel(req.cookies.token, 0);
             const {
-                user_name, nickname, phone_num, profile_img, note, id
+                user_name, nickname, phone_num, profile_img, note, id, ip_list = []
             } = req.body;
             if (!(decode_user?.level >= 40)) {
                 return lowLevelException(req, res);
@@ -109,16 +120,50 @@ const userCtrl = {
             if (is_exist_user?.result.length > 0) {
                 return response(req, res, -100, "유저아이디가 이미 존재합니다.", false)
             }
-            console.log(req.files)
             let files = settingFiles(req.files);
             let obj = {
                 user_name, nickname, phone_num, profile_img, note
             };
             obj = { ...obj, ...files };
+            await db.beginTransaction();
             let result = await updateQuery(`${table_name}`, obj, id);
+            let result_insert_ip_list = [];
+            let result_update_ip_list = [];
+            let result_delete_ip_list = [];
+            for (var i = 0; i < ip_list.length; i++) {
+                if (!ip_list[i]?.id) {
+                    if (ip_list[i]?.is_delete != 1) {
+                        result_insert_ip_list.push([
+                            id,
+                            ip_list[i]?.ip,
+                        ])
+                    }
+                } else {
+                    if (ip_list[i]?.is_delete == 1) {
+                        result_delete_ip_list.push(ip_list[i]?.id);
+                    } else {
+                        result_update_ip_list.push(ip_list[i]);
+                    }
+                }
+            }
+            if (result_insert_ip_list.length > 0) {//신규
+                let insert_ip_result = await pool.query(`INSERT INTO permit_ips (user_id, ip) VALUES ?`, [result_insert_ip_list])
+            }
+            if (result_update_ip_list.length > 0) {//기존
+                for (var i = 0; i < result_update_ip_list.length; i++) {
+                    let update_ip_result = await updateQuery(`permit_ips`, {
+                        ip: result_update_ip_list[i]?.ip
+                    }, result_update_ip_list[i]?.id);
+                }
+            }
+            if (result_delete_ip_list.length > 0) {//기존거 삭제
+                let delete_ip_result = await pool.query(`DELETE FROM permit_ips WHERE id IN (${result_delete_ip_list.join()})`)
+            }
+            await db.commit();
             return response(req, res, 100, "success", {})
         } catch (err) {
             console.log(err)
+            await db.rollback();
             return response(req, res, -200, "서버 에러 발생", false)
         } finally {
 
@@ -184,6 +229,26 @@ const userCtrl = {
             }
             let obj = {
                 status
+            }
+            let result = await updateQuery(`${table_name}`, obj, id);
+            return response(req, res, 100, "success", {})
+        } catch (err) {
+            console.log(err)
+            return response(req, res, -200, "서버 에러 발생", false)
+        } finally {
+
+        }
+    },
+    changeApiKey: async (req, res, next) => {//api_key재발급
+        try {
+            let is_manager = await checkIsManagerUrl(req);
+            const decode_user = checkLevel(req.cookies.token, 0);
+            const { id } = req.params;
+            console.log(id)
+            let key_data = await createHashedPassword(`${id}`);
+            let api_key = key_data.hashedPassword.substring(0, 30);
+            let obj = {
+                api_key
             }
             let result = await updateQuery(`${table_name}`, obj, id);
             return response(req, res, 100, "success", {})

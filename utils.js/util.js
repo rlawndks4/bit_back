@@ -132,7 +132,7 @@ export const lowLevelException = (req, res) => {
 export const isItemBrandIdSameDnsId = (decode_dns, item) => {
     return decode_dns?.id == item?.brand_id
 }
-export const settingFiles = (obj={}) => {
+export const settingFiles = (obj={}, type='img') => {
     let keys = Object.keys(obj);
     let result = {};
     for (var i = 0; i < keys.length; i++) {
@@ -147,13 +147,13 @@ export const settingFiles = (obj={}) => {
         }
         if (is_multiple) {
             let files = obj[keys[i]];
-            result[`${keys[i].split('_file')[0]}_imgs`] = files.map(item => {
+            result[`${keys[i].split('_file')[0]}_${type}s`] = files.map(item => {
                 return (process.env.NODE_ENV == 'development' ? process.env.BACK_URL_TEST : process.env.BACK_URL) + '/' + item.destination + item.filename;
             }).join(',')
             files = `[${files}]`;
         } else {
             file.destination = 'files/' + file.destination.split('files/')[1];
-            result[`${keys[i].split('_file')[0]}_img`] = (process.env.NODE_ENV == 'development' ? process.env.BACK_URL_TEST : process.env.BACK_URL) + '/' + file.destination + file.filename;
+            result[`${keys[i].split('_file')[0]}_${type}`] = (process.env.NODE_ENV == 'development' ? process.env.BACK_URL_TEST : process.env.BACK_URL) + '/' + file.destination + file.filename;
         }
     }
     console.log(result)
@@ -162,11 +162,17 @@ export const settingFiles = (obj={}) => {
 export const imageFieldList = [
     'post_file',
     'profile_file',
-    'shop_file',
     'logo_file',
     'dark_logo_file',
     'favicon_file',
     'og_file',
+    'delegator_tel_sub_file',
+    'delegator_bsin_lic_file',
+    'delegator_consign_file',
+    'mandatary_bsin_lic_file',
+    'mandatary_warrant_file',
+    'mandatary_seal_file',
+    'mandatary_agent_serve_file',
 
 ].map(field => {
     return {

@@ -13,9 +13,15 @@ router
     .get(userCtrl.get)
     .put(userCtrl.update)
     .delete(userCtrl.remove)
+
 router
     .route('/change-pw/:id')
     .put(userCtrl.changePassword)
+    
+router
+    .route('/change-api-key/:id')
+    .put(userCtrl.changeApiKey)
+
 router
     .route('/change-status/:id')
     .put(userCtrl.changeStatus)
