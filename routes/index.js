@@ -6,6 +6,7 @@ import postRoutes from './post.route.js';
 import domainRoutes from './domain.route.js';
 import brandRoutes from './brand.route.js';
 import senderRoutes from './sender.route.js';
+import depositRoutes from './deposit.route.js';
 
 const router = express.Router(); // eslint-disable-line new-cap
 
@@ -16,7 +17,7 @@ router.use('/users', userRoutes);
 router.use('/posts', postRoutes);
 router.use('/brands', brandRoutes);
 router.use('/senders', senderRoutes);
-
+router.use('/deposits', depositRoutes);
 
 //auth
 router.use('/auth', authRoutes);

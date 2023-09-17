@@ -55,7 +55,7 @@ const Ctrl = {
             } = req.body;
             let files = settingFiles(req.files);
             let obj = {
-                name, note, price, category_id
+                name, note, deposit, category_id
             };
 
             obj = { ...obj, ...files };

@@ -7,6 +7,7 @@ import postCtrl from './post.controller.js';
 import domainCtrl from './domain.controller.js';
 import brandCtrl from './brand.controller.js';
 import senderCtrl from './sender.controller.js';
+import depositCtrl from './deposit.controller.js';
 
 export {
     userCtrl,
@@ -16,4 +17,5 @@ export {
     domainCtrl,
     brandCtrl,
     senderCtrl,
+    depositCtrl,
 };

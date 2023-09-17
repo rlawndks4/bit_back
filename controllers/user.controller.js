@@ -17,9 +17,10 @@ const userCtrl = {
 
             let columns = [
                 `${table_name}.*`,
+                `(SELECT SUM(deposit) FROM deposits WHERE user_id=${table_name}.id) AS total_deposit`
             ]
             let sql = `SELECT ${process.env.SELECT_COLUMN_SECRET} FROM ${table_name} `;
-            sql += ` WHERE 1=1 `
+            sql += ` WHERE 1=1 `;
             if (!level) {
                 sql += ` AND ${table_name}.level=0 `;
             } else {
