@@ -12,7 +12,7 @@ const userCtrl = {
         try {
             let is_manager = await checkIsManagerUrl(req);
             const decode_user = checkLevel(req.cookies.token, 0);
-
+            const decode_dns = checkLevel(req.cookies.dns, 0);
             const { level } = req.query;
 
             let columns = [
@@ -20,13 +20,13 @@ const userCtrl = {
                 `(SELECT SUM(deposit) FROM deposits WHERE user_id=${table_name}.id) AS total_deposit`
             ]
             let sql = `SELECT ${process.env.SELECT_COLUMN_SECRET} FROM ${table_name} `;
-            sql += ` WHERE 1=1 `;
+            sql += ` WHERE brand_id=${decode_dns?.id} `;
             if (!level) {
                 sql += ` AND ${table_name}.level=0 `;
             } else {
                 sql += ` AND ${table_name}.level=${level} `;
             }
-
+            console.log(sql)
             let data = await getSelectQuery(sql, columns, req.query);
 
             return response(req, res, 100, "success", data);
@@ -64,7 +64,7 @@ const userCtrl = {
             const decode_user = checkLevel(req.cookies.token, 0);
 
             let {
-                user_name, user_pw, nickname, level = 0, phone_num, profile_img, note, ip_list = []
+                user_name, user_pw, nickname, level = 0, phone_num, profile_img, note, ip_list = [], brand_id
             } = req.body;
             if (level > decode_user?.level) {
                 return lowLevelException(req, res);
@@ -78,7 +78,7 @@ const userCtrl = {
             let user_salt = pw_data.salt;
             let files = settingFiles(req.files);
             let obj = {
-                user_name, user_pw, user_salt, nickname, level, phone_num, profile_img, note
+                user_name, user_pw, user_salt, nickname, level, phone_num, profile_img, note, brand_id
             };
             obj = { ...obj, ...files };
             await db.beginTransaction();

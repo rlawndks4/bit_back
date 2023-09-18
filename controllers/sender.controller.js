@@ -13,6 +13,7 @@ const senderCtrl = {
         try {
             let is_manager = await checkIsManagerUrl(req);
             const decode_user = checkLevel(req.cookies.token, 0);
+            const decode_dns = checkLevel(req.cookies.dns, 0);
 
             const { } = req.query;
 
@@ -23,6 +24,7 @@ const senderCtrl = {
             ]
             let sql = `SELECT ${process.env.SELECT_COLUMN_SECRET} FROM ${table_name} `;
             sql += ` LEFT JOIN users ON ${table_name}.user_id=users.id `;
+            sql += ` WHERE users.brand_id=${decode_dns?.id} `;
             let data = await getSelectQuery(sql, columns, req.query);
             data = settingGetDataByTable(data, table_name);
             return response(req, res, 100, "success", data);
