@@ -44,6 +44,7 @@ const userCtrl = {
             const { id } = req.params;
             let data = await pool.query(`SELECT * FROM ${table_name} WHERE id=${id}`)
             data = data?.result[0];
+            data['setting_obj'] = JSON.parse(data?.setting_obj ?? '{}');
             let ip_list = await pool.query(`SELECT * FROM permit_ips WHERE user_id=${id} AND is_delete=0`);
             data = {
                 ...data,
@@ -63,8 +64,9 @@ const userCtrl = {
             const decode_user = checkLevel(req.cookies.token, 0);
 
             let {
-                user_name, user_pw, nickname, level = 0, phone_num, profile_img, note, ip_list = [], brand_id
+                user_name, user_pw, nickname, level = 0, phone_num, profile_img, note, ip_list = [], brand_id, setting_obj = {},
             } = req.body;
+            
             if (level > decode_user?.level) {
                 return lowLevelException(req, res);
             }
@@ -72,13 +74,20 @@ const userCtrl = {
             if (is_exist_user?.result.length > 0) {
                 return response(req, res, -100, "유저아이디가 이미 존재합니다.", false)
             }
+            if(Object.keys(setting_obj).length == 0){
+                let dns_data = await pool.query(`SELECT * FROM brands WHERE id=${brand_id}`);
+                dns_data = dns_data?.result[0];
+                dns_data['setting_obj'] = JSON.parse(dns_data?.setting_obj ?? '{}');
+                setting_obj = dns_data['setting_obj'];
+            }
             let pw_data = await createHashedPassword(user_pw);
             user_pw = pw_data.hashedPassword;
             let user_salt = pw_data.salt;
             let files = settingFiles(req.files);
             let obj = {
-                user_name, user_pw, user_salt, nickname, level, phone_num, profile_img, note, brand_id
+                user_name, user_pw, user_salt, nickname, level, phone_num, profile_img, note, brand_id, setting_obj
             };
+            obj['setting_obj'] = JSON.stringify(obj.setting_obj);
             obj = { ...obj, ...files };
             await db.beginTransaction();
             let result = await insertQuery(`${table_name}`, obj);
@@ -111,7 +120,7 @@ const userCtrl = {
             let is_manager = await checkIsManagerUrl(req);
             const decode_user = checkLevel(req.cookies.token, 0);
             const {
-                user_name, nickname, phone_num, profile_img, note, id, ip_list = []
+                user_name, nickname, phone_num, profile_img, note, id, ip_list = [], setting_obj = {},
             } = req.body;
             if (!(decode_user?.level >= 40)) {
                 return lowLevelException(req, res);
@@ -122,8 +131,9 @@ const userCtrl = {
             }
             let files = settingFiles(req.files);
             let obj = {
-                user_name, nickname, phone_num, profile_img, note
+                user_name, nickname, phone_num, profile_img, note, setting_obj
             };
+            obj['setting_obj'] = JSON.stringify(obj.setting_obj);
             obj = { ...obj, ...files };
             await db.beginTransaction();
             let result = await updateQuery(`${table_name}`, obj, id);
