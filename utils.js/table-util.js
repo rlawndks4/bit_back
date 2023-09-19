@@ -14,7 +14,13 @@ export const settingGetDataByTable = (data_, table) => {
             } else if (col.method_type == 1) {
                 data.content[i].method_type_str = '관리자 수정';
             } else if (col.method_type == 2) {
-                data.content[i].method_type_str = '발송';
+                if(data.content[i].type==0){
+                    data.content[i].method_type_str = '발송실패';
+                }else if(data.content[i].type==1){
+                    data.content[i].method_type_str = '발송';
+                }else{
+                    data.content[i].method_type_str = '---';
+                }
             }
         }
     }

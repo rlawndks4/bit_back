@@ -26,7 +26,6 @@ const userCtrl = {
             } else {
                 sql += ` AND ${table_name}.level=${level} `;
             }
-            console.log(sql)
             let data = await getSelectQuery(sql, columns, req.query);
 
             return response(req, res, 100, "success", data);
