@@ -8,6 +8,9 @@ router
     .route('/')
     .get(authCtrl.checkSign);
 router
+    .route('/deposit')
+    .get(authCtrl.getDeposit);
+router
     .route('/sign-in')
     .post(authCtrl.signIn);
 router

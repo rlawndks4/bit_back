@@ -37,5 +37,18 @@ export const settingGetDataByTable = (data_, table) => {
 
         }
     }
+    if (table == 'kakao_channels') {
+        for (var i = 0; i < data.content.length; i++) {
+            let col = data.content[i];
+            if (col.status == 0) {
+                data.content[i].status_str = '정상';
+            } else if (col.status == 1) {
+                data.content[i].status_str = '검토중';
+            } else if (col.status == 2) {
+                data.content[i].status_str = '차단됨';
+            }
+
+        }
+    }
     return data;
 }

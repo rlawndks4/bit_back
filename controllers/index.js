@@ -8,6 +8,7 @@ import domainCtrl from './domain.controller.js';
 import brandCtrl from './brand.controller.js';
 import senderCtrl from './sender.controller.js';
 import depositCtrl from './deposit.controller.js';
+import kakaoChannelCtrl from './kakao_channel.controller.js';
 
 export {
     userCtrl,
@@ -18,4 +19,5 @@ export {
     brandCtrl,
     senderCtrl,
     depositCtrl,
+    kakaoChannelCtrl,
 };

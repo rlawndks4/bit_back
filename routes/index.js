@@ -7,6 +7,7 @@ import domainRoutes from './domain.route.js';
 import brandRoutes from './brand.route.js';
 import senderRoutes from './sender.route.js';
 import depositRoutes from './deposit.route.js';
+import kakaoChannelRoutes from './kakao_channel.route.js';
 
 const router = express.Router(); // eslint-disable-line new-cap
 
@@ -18,6 +19,7 @@ router.use('/posts', postRoutes);
 router.use('/brands', brandRoutes);
 router.use('/senders', senderRoutes);
 router.use('/deposits', depositRoutes);
+router.use('/kakao-channels', kakaoChannelRoutes);
 
 //auth
 router.use('/auth', authRoutes);

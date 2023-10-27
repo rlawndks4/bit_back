@@ -1,5 +1,5 @@
 'use strict';
-import { pool } from "../config/db.js";
+import db, { pool } from "../config/db.js";
 import { checkIsManagerUrl, returnMoment } from "../utils.js/function.js";
 import { insertQuery, updateQuery } from "../utils.js/query-util.js";
 import { createHashedPassword, checkLevel, makeUserToken, response, checkDns, lowLevelException, settingFiles } from "../utils.js/util.js";
@@ -122,6 +122,20 @@ const authCtrl = {
             const decode_user = checkLevel(req.cookies.token, 0);
 
             return response(req, res, 100, "success", decode_user)
+        } catch (err) {
+            console.log(err)
+            return response(req, res, -200, "서버 에러 발생", false)
+        } finally {
+
+        }
+    },
+    getDeposit: async (req, res, next) => {
+        try {
+            let is_manager = await checkIsManagerUrl(req);
+            const decode_user = checkLevel(req.cookies.token, 0);
+            let user_point = await pool.query(`SELECT SUM(deposit) AS deposit FROM deposits WHERE user_id=${decode_user?.id}`);
+            user_point = user_point?.result[0];
+            return response(req, res, 100, "success", user_point)
         } catch (err) {
             console.log(err)
             return response(req, res, -200, "서버 에러 발생", false)
