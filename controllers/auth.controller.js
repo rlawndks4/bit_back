@@ -133,7 +133,7 @@ const authCtrl = {
         try {
             let is_manager = await checkIsManagerUrl(req);
             const decode_user = checkLevel(req.cookies.token, 0);
-            let user_point = await pool.query(`SELECT SUM(deposit) AS deposit FROM deposits WHERE user_id=${decode_user?.id}`);
+            let user_point = await pool.query(`SELECT SUM(deposit) AS deposit FROM deposits WHERE user_id=${decode_user?.id??0}`);
             user_point = user_point?.result[0];
             return response(req, res, 100, "success", user_point)
         } catch (err) {
