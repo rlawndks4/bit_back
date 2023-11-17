@@ -14,7 +14,7 @@ const depositCtrl = {
             let is_manager = await checkIsManagerUrl(req);
             const decode_user = checkLevel(req.cookies.token, 0);
             const decode_dns = checkLevel(req.cookies.dns, 0);
-            
+
             const { } = req.query;
 
             let columns = [
@@ -22,9 +22,12 @@ const depositCtrl = {
                 `users.user_name`,
                 `users.api_key`,
                 `SUM(deposits.deposit) OVER (PARTITION BY deposits.user_id ORDER BY deposits.id) AS total_deposit`,
+                `msg_logs.msg`,
+                `msg_logs.res_msg`
             ]
             let sql = `SELECT ${process.env.SELECT_COLUMN_SECRET} FROM ${table_name} `;
             sql += ` LEFT JOIN users ON ${table_name}.user_id=users.id `;
+            sql += ` LEFT JOIN msg_logs ON ${table_name}.msg_log_id=msg_logs.id `;
             sql += ` WHERE users.brand_id=${decode_dns?.id} `;
             let data = await getSelectQuery(sql, columns, req.query);
             data = settingGetDataByTable(data, table_name);
@@ -70,7 +73,7 @@ const depositCtrl = {
                 user_name, note, deposit, method_type
             } = req.body;
             let files = settingFiles(req.files, 'file');
-            
+
             let obj = {
                 note, deposit, method_type
             };
@@ -80,9 +83,9 @@ const depositCtrl = {
             }
             let user = is_exist_user?.result[0];
             obj['user_id'] = user?.id;
-            if(deposit>=0){
+            if (deposit >= 0) {
                 obj['type'] = 0;
-            }else{
+            } else {
                 obj['type'] = 1;
             }
             obj = { ...obj, ...files };
@@ -117,9 +120,9 @@ const depositCtrl = {
             let user = is_exist_user?.result[0];
             obj['user_id'] = user?.id;
             obj = { ...obj, ...files };
-            if(deposit>=0){
+            if (deposit >= 0) {
                 obj['type'] = 0;
-            }else{
+            } else {
                 obj['type'] = 1;
             }
             let result = await updateQuery(`${table_name}`, obj, id);
