@@ -24,7 +24,8 @@ const depositCtrl = {
                 `SUM(deposits.deposit) OVER (PARTITION BY deposits.user_id ORDER BY deposits.id) AS total_deposit`,
                 `msg_logs.msg`,
                 `msg_logs.res_msg`,
-                `msg_logs.ref_key`
+                `msg_logs.ref_key`,
+                `msg_logs.receiver`,
             ]
             let sql = `SELECT ${process.env.SELECT_COLUMN_SECRET} FROM ${table_name} `;
             sql += ` LEFT JOIN users ON ${table_name}.user_id=users.id `;
