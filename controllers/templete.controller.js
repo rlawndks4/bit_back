@@ -2,32 +2,37 @@
 import { pool } from "../config/db.js";
 import { checkIsManagerUrl } from "../utils.js/function.js";
 import { deleteQuery, getSelectQuery, insertQuery, selectQuerySimple, updateQuery } from "../utils.js/query-util.js";
-import { settingGetDataByTable } from "../utils.js/table-util.js";
 import { checkDns, checkLevel, response, settingFiles } from "../utils.js/util.js";
 import 'dotenv/config';
 
-const table_name = 'kakao_channels';
+const table_name = 'templetes';
 
-const kakaoChannelCtrl = {
+const templeteCtrl = {
     list: async (req, res, next) => {
         try {
             let is_manager = await checkIsManagerUrl(req);
             const decode_user = checkLevel(req.cookies.token, 0);
-            const decode_dns = checkLevel(req.cookies.dns, 0);
 
-            const { } = req.query;
-
+            const { channel_id } = req.query;
             let columns = [
                 `${table_name}.*`,
+                `kakao_channels.channel_user_name`,
+                `kakao_channels.phone_num AS sender`,
                 `users.user_name`,
                 `users.api_key`,
-                `(SELECT COUNT(*) FROM templetes WHERE templetes.channel_id=${table_name}.id) AS templete_count`,
+                `users.kakao_token`,
             ]
             let sql = `SELECT ${process.env.SELECT_COLUMN_SECRET} FROM ${table_name} `;
+            sql += ` LEFT JOIN kakao_channels ON ${table_name}.channel_id=kakao_channels.id `;
             sql += ` LEFT JOIN users ON ${table_name}.user_id=users.id `;
-            sql += ` WHERE users.brand_id=${decode_dns?.id} `;
+            sql += ` WHERE 1=1 `;
+            if (channel_id) {
+                sql += ` AND ${table_name}.channel_id=${channel_id} `
+            }
             let data = await getSelectQuery(sql, columns, req.query);
-            data = settingGetDataByTable(data, table_name);
+            for (var i = 0; i < data.content.length; i++) {
+                data.content[i].button_obj = JSON.parse(data?.content[i]?.button_obj ?? '[]');
+            }
             return response(req, res, 100, "success", data);
         } catch (err) {
             console.log(err)
@@ -45,13 +50,15 @@ const kakaoChannelCtrl = {
             let columns = [
                 `${table_name}.*`,
                 `users.user_name`,
-                `users.api_key`,
+                `kakao_channels.channel_user_name`,
             ]
             let sql = `SELECT ${columns.join()} FROM ${table_name} `;
             sql += ` LEFT JOIN users ON ${table_name}.user_id=users.id `;
+            sql += ` LEFT JOIN kakao_channels ON ${table_name}.channel_id=kakao_channels.id `;
             sql += ` WHERE ${table_name}.id=${id} `
             let data = await pool.query(sql);
             data = data?.result[0];
+            data['button_obj'] = JSON.parse(data?.button_obj ?? '[]')
             return response(req, res, 100, "success", data)
         } catch (err) {
             console.log(err)
@@ -65,19 +72,36 @@ const kakaoChannelCtrl = {
             let is_manager = await checkIsManagerUrl(req);
             const decode_user = checkLevel(req.cookies.token, 0);
 
-            const {
-                channel_user_name, phone_num, user_name, note, status = 0
+            let {
+                msg_type,
+                tpl_code, emphasis_type, img_type, templete_img_text, nickname, title = "", sub_title = "", msg = "",
+                button_obj = [],
+                channel_user_name, user_name,
             } = req.body;
-            let files = settingFiles(req.files, 'file');
-            let obj = {
-                channel_user_name, phone_num, note, status
-            };
-            let is_exist_user = await pool.query(`SELECT * FROM users WHERE user_name=? `, [user_name]);
-            if (is_exist_user?.result.length == 0) {
-                return response(req, res, -100, "존재하지 않는 유저입니다.", false)
+            let kakao_channel = await pool.query(`SELECT kakao_channels.* FROM kakao_channels LEFT JOIN users ON kakao_channels.user_id=users.id WHERE kakao_channels.channel_user_name=? AND users.user_name=?`, [channel_user_name, user_name])
+            kakao_channel = kakao_channel?.result[0];
+            if (!kakao_channel) {
+                return response(req, res, -100, "유저 및 채널정보가 정확하지 않습니다.", false);
             }
-            let user = is_exist_user?.result[0];
-            obj['user_id'] = user?.id;
+            let channel_id = kakao_channel?.id
+            let user_id = kakao_channel?.user_id
+            button_obj = JSON.stringify(button_obj);
+            let files = settingFiles(req.files);
+            let obj = {
+                channel_id,
+                user_id,
+                tpl_code,
+                nickname,
+                msg_type,
+                emphasis_type,
+                img_type,
+                templete_img_text,
+                title,
+                sub_title,
+                msg,
+                button_obj
+            };
+            console.log(button_obj)
             obj = { ...obj, ...files };
 
             let result = await insertQuery(`${table_name}`, obj);
@@ -94,22 +118,39 @@ const kakaoChannelCtrl = {
         try {
             let is_manager = await checkIsManagerUrl(req);
             const decode_user = checkLevel(req.cookies.token, 0);
-
-            const {
-                channel_user_name, phone_num, user_name, note, status = 0,
+            let {
+                msg_type,
+                tpl_code, emphasis_type, img_type, templete_img_text, nickname, title = "", sub_title = "", msg = "",
+                button_obj = [],
+                channel_user_name, user_name,
                 id
             } = req.body;
-            let files = settingFiles(req.files, 'file');
-            let is_exist_user = await pool.query(`SELECT * FROM users WHERE user_name=? `, [user_name]);
-            if (is_exist_user?.result.length == 0) {
-                return response(req, res, -100, "존재하지 않는 유저입니다.", false)
+            let kakao_channel = await pool.query(`SELECT kakao_channels.* FROM kakao_channels LEFT JOIN users ON kakao_channels.user_id=users.id WHERE kakao_channels.channel_user_name=? AND users.user_name=?`, [channel_user_name, user_name])
+            kakao_channel = kakao_channel?.result[0];
+            if (!kakao_channel) {
+                return response(req, res, -100, "유저 및 채널정보가 정확하지 않습니다.", false);
             }
+            let channel_id = kakao_channel?.id
+            let user_id = kakao_channel?.user_id
+            button_obj = JSON.stringify(button_obj);
+            let files = settingFiles(req.files);
             let obj = {
-                channel_user_name, phone_num, note, status
+                channel_id,
+                user_id,
+                tpl_code,
+                nickname,
+                msg_type,
+                emphasis_type,
+                img_type,
+                templete_img_text,
+                title,
+                sub_title,
+                msg,
+                button_obj
             };
-            let user = is_exist_user?.result[0];
-            obj['user_id'] = user?.id;
+            console.log(button_obj)
             obj = { ...obj, ...files };
+
 
             let result = await updateQuery(`${table_name}`, obj, id);
 
@@ -140,4 +181,4 @@ const kakaoChannelCtrl = {
     },
 };
 
-export default kakaoChannelCtrl;
+export default templeteCtrl;

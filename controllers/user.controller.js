@@ -66,15 +66,15 @@ const userCtrl = {
             let {
                 user_name, user_pw, nickname, level = 0, phone_num, profile_img, note, ip_list = [], brand_id, setting_obj = {},
             } = req.body;
-            
+
             if (level > decode_user?.level) {
                 return lowLevelException(req, res);
             }
-            let is_exist_user = await pool.query(`SELECT * FROM ${table_name} WHERE user_name=? `, [user_name]);
+            let is_exist_user = await pool.query(`SELECT * FROM ${table_name} WHERE user_name=? AND brand_id=${brand_id}`, [user_name]);
             if (is_exist_user?.result.length > 0) {
                 return response(req, res, -100, "유저아이디가 이미 존재합니다.", false)
             }
-            if(Object.keys(setting_obj).length == 0){
+            if (Object.keys(setting_obj).length == 0) {
                 let dns_data = await pool.query(`SELECT * FROM brands WHERE id=${brand_id}`);
                 dns_data = dns_data?.result[0];
                 dns_data['setting_obj'] = JSON.parse(dns_data?.setting_obj ?? '{}');

@@ -108,7 +108,7 @@ const logRequestResponse = async (req, res, decode_user, decode_dns) => {//ë¡œê·
         user_id = -1;
     }
     let brand_id = -1;
-  
+
     // let result = await pool.query(
     //     "INSERT INTO logs (request, response_data, response_result, response_message, request_ip, user_id) VALUES (?, ?, ?, ?, ?, ?)",
     //     [request, JSON.stringify(res?.data), res?.result, res?.message, requestIp, user_id]
@@ -132,7 +132,7 @@ export const lowLevelException = (req, res) => {
 export const isItemBrandIdSameDnsId = (decode_dns, item) => {
     return decode_dns?.id == item?.brand_id
 }
-export const settingFiles = (obj={}, type='img') => {
+export const settingFiles = (obj = {}, type = 'img') => {
     let keys = Object.keys(obj);
     let result = {};
     for (var i = 0; i < keys.length; i++) {
@@ -173,6 +173,7 @@ export const imageFieldList = [
     'mandatary_warrant_file',
     'mandatary_seal_file',
     'mandatary_agent_serve_file',
+    'templete_file',
 
 ].map(field => {
     return {
