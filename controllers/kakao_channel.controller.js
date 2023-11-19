@@ -66,11 +66,11 @@ const kakaoChannelCtrl = {
             const decode_user = checkLevel(req.cookies.token, 0);
 
             const {
-                channel_user_name, phone_num, user_name, note, status = 0
+                channel_user_name, phone_num, user_name, note, status = 0, senderkey
             } = req.body;
             let files = settingFiles(req.files, 'file');
             let obj = {
-                channel_user_name, phone_num, note, status
+                channel_user_name, phone_num, note, status, senderkey
             };
             let is_exist_user = await pool.query(`SELECT * FROM users WHERE user_name=? `, [user_name]);
             if (is_exist_user?.result.length == 0) {
@@ -96,7 +96,7 @@ const kakaoChannelCtrl = {
             const decode_user = checkLevel(req.cookies.token, 0);
 
             const {
-                channel_user_name, phone_num, user_name, note, status = 0,
+                channel_user_name, phone_num, user_name, note, status = 0, senderkey,
                 id
             } = req.body;
             let files = settingFiles(req.files, 'file');
@@ -105,7 +105,7 @@ const kakaoChannelCtrl = {
                 return response(req, res, -100, "존재하지 않는 유저입니다.", false)
             }
             let obj = {
-                channel_user_name, phone_num, note, status
+                channel_user_name, phone_num, note, status, senderkey
             };
             let user = is_exist_user?.result[0];
             obj['user_id'] = user?.id;
