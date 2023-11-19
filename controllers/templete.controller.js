@@ -18,9 +18,11 @@ const templeteCtrl = {
                 `${table_name}.*`,
                 `kakao_channels.channel_user_name`,
                 `kakao_channels.phone_num AS sender`,
+                `kakao_channels.senderkey`,
                 `users.user_name`,
                 `users.api_key`,
                 `users.kakao_token`,
+
             ]
             let sql = `SELECT ${process.env.SELECT_COLUMN_SECRET} FROM ${table_name} `;
             sql += ` LEFT JOIN kakao_channels ON ${table_name}.channel_id=kakao_channels.id `;
