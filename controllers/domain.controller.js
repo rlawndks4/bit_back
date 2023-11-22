@@ -12,6 +12,7 @@ const domainCtrl = {
             brand = brand?.result[0];
             brand['theme_css'] = JSON.parse(brand?.theme_css ?? '{}');
             brand['setting_obj'] = JSON.parse(brand?.setting_obj ?? '{}');
+            brand['bizppurio_obj'] = JSON.parse(brand?.bizppurio_obj ?? '{}');
             const token = await makeUserToken(brand);
             res.cookie("dns", token, {
                 httpOnly: true,
@@ -24,7 +25,7 @@ const domainCtrl = {
             console.log(err)
             return response(req, res, -200, "서버 에러 발생", false)
         } finally {
-            
+
         }
     },
 }
