@@ -22,6 +22,7 @@ const depositCtrl = {
                 `users.user_name`,
                 `users.api_key`,
                 `SUM(deposits.deposit) OVER (PARTITION BY deposits.user_id ORDER BY deposits.id) AS total_deposit`,
+                `SUM(deposits.brand_deposit) OVER (PARTITION BY deposits.user_id ORDER BY deposits.id) AS total_brand_deposit`,
                 `msg_logs.msg`,
                 `msg_logs.res_msg`,
                 `msg_logs.ref_key`,
