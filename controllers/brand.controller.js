@@ -42,6 +42,7 @@ const brandCtrl = {
             data = data?.result[0];
             data['theme_css'] = JSON.parse(data?.theme_css ?? '{}');
             data['setting_obj'] = JSON.parse(data?.setting_obj ?? '{}');
+            data['bizppurio_obj'] = JSON.parse(data?.bizppurio_obj ?? '{}');
 
             return response(req, res, 100, "success", data)
         } catch (err) {
@@ -60,15 +61,16 @@ const brandCtrl = {
             }
             const decode_dns = checkDns(req.cookies.dns);
             const {
-                name, dns, og_description, company_name, business_num, pvcy_rep_name, ceo_name, addr, addr_detail, resident_num, phone_num, fax_num, note, theme_css = {}, setting_obj = {},
+                name, dns, og_description, company_name, business_num, pvcy_rep_name, ceo_name, addr, addr_detail, resident_num, phone_num, fax_num, note, theme_css = {}, setting_obj = {}, bizppurio_obj = {},
                 user_name, user_pw
             } = req.body;
             let files = settingFiles(req.files);
             let obj = {
-                name, dns, og_description, company_name, business_num, pvcy_rep_name, ceo_name, addr, addr_detail, resident_num, phone_num, fax_num, note, theme_css, setting_obj
+                name, dns, og_description, company_name, business_num, pvcy_rep_name, ceo_name, addr, addr_detail, resident_num, phone_num, fax_num, note, theme_css, setting_obj, bizppurio_obj
             };
             obj['theme_css'] = JSON.stringify(obj.theme_css);
             obj['setting_obj'] = JSON.stringify(obj.setting_obj);
+            obj['bizppurio_obj'] = JSON.stringify(obj.bizppurio_obj);
             obj = { ...obj, ...files };
             await db.beginTransaction();
 
@@ -101,7 +103,7 @@ const brandCtrl = {
             const decode_user = checkLevel(req.cookies.token, 0);
             const decode_dns = checkDns(req.cookies.dns);
             const {
-                name, dns, og_description, company_name, business_num, pvcy_rep_name, ceo_name, addr, addr_detail, resident_num, phone_num, fax_num, note, theme_css = {}, setting_obj = {},
+                name, dns, og_description, company_name, business_num, pvcy_rep_name, ceo_name, addr, addr_detail, resident_num, phone_num, fax_num, note, theme_css = {}, setting_obj = {}, bizppurio_obj = {},
             } = req.body;
             const { id } = req.params;
             if (decode_user?.level < 40) {
@@ -110,10 +112,11 @@ const brandCtrl = {
             let files = settingFiles(req.files);
 
             let obj = {
-                name, dns, og_description, company_name, business_num, pvcy_rep_name, ceo_name, addr, addr_detail, resident_num, phone_num, fax_num, note, theme_css, setting_obj
+                name, dns, og_description, company_name, business_num, pvcy_rep_name, ceo_name, addr, addr_detail, resident_num, phone_num, fax_num, note, theme_css, setting_obj, bizppurio_obj
             };
             obj['theme_css'] = JSON.stringify(obj.theme_css);
             obj['setting_obj'] = JSON.stringify(obj.setting_obj);
+            obj['bizppurio_obj'] = JSON.stringify(obj.bizppurio_obj);
             obj = { ...obj, ...files };
 
             let result = await updateQuery(`${table_name}`, obj, id);
