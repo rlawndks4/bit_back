@@ -22,5 +22,7 @@ router
 router
     .route('/update')
     .post(authCtrl.updateMyInfo);
-
+router
+    .route('/change-pw')
+    .post(authCtrl.changePassword);
 export default router;

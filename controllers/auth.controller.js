@@ -133,7 +133,7 @@ const authCtrl = {
         try {
             let is_manager = await checkIsManagerUrl(req);
             const decode_user = checkLevel(req.cookies.token, 0);
-            let user_point = await pool.query(`SELECT SUM(deposit) AS deposit FROM deposits WHERE user_id=${decode_user?.id??0}`);
+            let user_point = await pool.query(`SELECT SUM(deposit) AS deposit FROM deposits WHERE user_id=${decode_user?.id ?? 0}`);
             user_point = user_point?.result[0];
             return response(req, res, 100, "success", user_point)
         } catch (err) {
@@ -148,11 +148,11 @@ const authCtrl = {
             let is_manager = await checkIsManagerUrl(req);
             const decode_user = checkLevel(req.cookies.token, is_manager ? 1 : 0);
             const {
-               nickname, phone_num, profile_img
+                nickname, phone_num, profile_img
             } = req.body;
             let files = settingFiles(req.files);
             let obj = {
-                nickname, phone_num, profile_img 
+                nickname, phone_num, profile_img
             };
             obj = { ...obj, ...files };
             let result = await updateQuery(`users`, obj, decode_user?.id);
@@ -174,6 +174,34 @@ const authCtrl = {
                 //secure: true 
             });
             console.log(123)
+            return response(req, res, 100, "success", {})
+        } catch (err) {
+            console.log(err)
+            return response(req, res, -200, "서버 에러 발생", false)
+        } finally {
+
+        }
+    },
+    changePassword: async (req, res, next) => {
+        try {
+            let is_manager = await checkIsManagerUrl(req);
+            const decode_user = checkLevel(req.cookies.token, 0);
+            if (!decode_user) {
+                return lowLevelException(req, res);
+            }
+            let id = decode_user?.id;
+            let { user_pw } = req.body;
+
+            let user = await selectQuerySimple(table_name, id);
+            user = user?.result[0];
+
+            let pw_data = await createHashedPassword(user_pw);
+            user_pw = pw_data.hashedPassword;
+            let user_salt = pw_data.salt;
+            let obj = {
+                user_pw, user_salt
+            }
+            let result = await updateQuery(`${table_name}`, obj, id);
             return response(req, res, 100, "success", {})
         } catch (err) {
             console.log(err)
