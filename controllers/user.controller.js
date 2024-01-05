@@ -17,7 +17,6 @@ const userCtrl = {
 
             let columns = [
                 `${table_name}.*`,
-                `(SELECT SUM(deposit) FROM deposits WHERE user_id=${table_name}.id) AS total_deposit`
             ]
             let sql = `SELECT ${process.env.SELECT_COLUMN_SECRET} FROM ${table_name} `;
             sql += ` WHERE brand_id=${decode_dns?.id} `;
