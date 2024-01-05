@@ -15,7 +15,7 @@ const postCtrl = {
     list: async (req, res, next) => {
         try {
             let is_manager = await checkIsManagerUrl(req);
-            const decode_dns = checkLevel(req.cookies.dns, 0);
+            const decode_dns = checkDns(req.cookies.dns, 0);
             const decode_user = checkLevel(req.cookies.token, 0);
             const { type, is_mine, shop_id } = req.query;
             let columns = [
@@ -59,6 +59,7 @@ const postCtrl = {
         try {
             let is_manager = await checkIsManagerUrl(req);
             const decode_user = checkLevel(req.cookies.token, 0);
+            const decode_dns = checkDns(req.cookies.dns, 0);
             const {
                 title,
                 note,
@@ -69,7 +70,8 @@ const postCtrl = {
                 title,
                 note,
                 type,
-                user_id: decode_user?.id
+                user_id: decode_user?.id,
+                brand_id: decode_dns?.id
             };
             obj = { ...obj, ...files };
 
