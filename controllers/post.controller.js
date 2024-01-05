@@ -21,21 +21,14 @@ const postCtrl = {
                 `${table_name}.*`,
                 `users.user_name`,
                 `users.nickname`,
-                `shops.name AS shop_name`,
             ]
             let sql = `SELECT ${process.env.SELECT_COLUMN_SECRET} FROM ${table_name} `;
             sql += ` LEFT JOIN users ON ${table_name}.user_id=users.id `;
-            sql += ` LEFT JOIN shops ON ${table_name}.shop_id=shops.id `;
             sql += ` WHERE 1=1 `
-            if(type){
+            if (type) {
                 sql += ` AND ${table_name}.type=${type} `;
             }
-            if(is_mine){
-                sql += ` AND ${table_name}.user_id=${decode_user?.id} `;
-            }
-            if(shop_id){
-                sql += ` AND ${table_name}.shop_id=${shop_id} `;
-            }
+
             let data = await getSelectQuery(sql, columns, req.query);
 
             return response(req, res, 100, "success", data);
@@ -68,14 +61,12 @@ const postCtrl = {
             const {
                 title,
                 note,
-                shop_id,
-                type='0',
+                type = '0',
             } = req.body;
             let files = settingFiles(req.files);
             let obj = {
                 title,
                 note,
-                shop_id,
                 type,
                 user_id: decode_user?.id
             };
@@ -95,19 +86,17 @@ const postCtrl = {
         try {
             let is_manager = await checkIsManagerUrl(req);
             const decode_user = checkLevel(req.cookies.token, 0);
-            
+
             const {
                 title,
                 note,
-                shop_id,
-                type='0',
+                type = '0',
                 id,
             } = req.body;
             let files = settingFiles(req.files);
             let obj = {
                 title,
                 note,
-                shop_id,
                 type,
                 user_id: decode_user?.id
             };
@@ -127,7 +116,7 @@ const postCtrl = {
         try {
             let is_manager = await checkIsManagerUrl(req);
             const decode_user = checkLevel(req.cookies.token, 0);
-            
+
             const { id } = req.params;
             let result = await deleteQuery(`${table_name}`, {
                 id
