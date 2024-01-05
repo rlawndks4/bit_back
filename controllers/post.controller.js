@@ -15,6 +15,7 @@ const postCtrl = {
     list: async (req, res, next) => {
         try {
             let is_manager = await checkIsManagerUrl(req);
+            const decode_dns = checkLevel(req.cookies.dns, 0);
             const decode_user = checkLevel(req.cookies.token, 0);
             const { type, is_mine, shop_id } = req.query;
             let columns = [
@@ -24,7 +25,7 @@ const postCtrl = {
             ]
             let sql = `SELECT ${process.env.SELECT_COLUMN_SECRET} FROM ${table_name} `;
             sql += ` LEFT JOIN users ON ${table_name}.user_id=users.id `;
-            sql += ` WHERE 1=1 `
+            sql += ` WHERE ${table_name}.brand_id=${decode_dns?.id} `;
             if (type) {
                 sql += ` AND ${table_name}.type=${type} `;
             }
