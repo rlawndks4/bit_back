@@ -7,8 +7,10 @@ import 'dotenv/config';
 const domainCtrl = {
     get: async (req, res, next) => {
         try {
-            const { dns } = req.query;
-            console.log(dns)
+            let { dns } = req.query;
+            if (dns == '127.0.0.1') {
+                dns = 'sety21.cafe24.com';
+            }
             let brand = await pool.query(`SELECT * FROM brands WHERE dns='${dns}'`);
             brand = brand?.result[0];
             brand['theme_css'] = JSON.parse(brand?.theme_css ?? '{}');
