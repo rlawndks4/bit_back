@@ -20,6 +20,7 @@ const domainCtrl = {
                 //sameSite: 'none', 
                 //secure: true 
             });
+            console.log(brand)
             return response(req, res, 100, "success", brand);
         } catch (err) {
             console.log(err)
