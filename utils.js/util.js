@@ -40,7 +40,7 @@ export const checkLevel = (token, level) => { //유저 정보 뿌려주기
         const decoded = jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
             //console.log(decoded)
             if (err) {
-                console.log("token이 변조되었습니다." + err);
+                // console.log("token이 변조되었습니다." + err);
                 return false
             }
             else return decoded;
@@ -65,7 +65,7 @@ export const checkDns = (token) => { //dns 정보 뿌려주기
         const decoded = jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
             //console.log(decoded)
             if (err) {
-                console.log("token이 변조되었습니다." + err);
+                // console.log("token이 변조되었습니다." + err);
                 return false
             }
             else return decoded;
@@ -181,6 +181,11 @@ export const imageFieldList = [
     'mandatary_seal_file',
     'mandatary_agent_serve_file',
     'templete_file',
+    'info_banner_file',
+    'program_info_banner_file',
+    'guide_banner_file',
+    'post_2_banner_file',
+    'post_3_banner_file',
 
 ].map(field => {
     return {
