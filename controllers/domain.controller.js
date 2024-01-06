@@ -8,6 +8,7 @@ const domainCtrl = {
     get: async (req, res, next) => {
         try {
             const { dns } = req.query;
+            console.log(dns)
             let brand = await pool.query(`SELECT * FROM brands WHERE dns='${dns}'`);
             brand = brand?.result[0];
             brand['theme_css'] = JSON.parse(brand?.theme_css ?? '{}');
