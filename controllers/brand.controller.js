@@ -43,6 +43,10 @@ const brandCtrl = {
             data['theme_css'] = JSON.parse(data?.theme_css ?? '{}');
             data['setting_obj'] = JSON.parse(data?.setting_obj ?? '{}');
             data['bizppurio_obj'] = JSON.parse(data?.bizppurio_obj ?? '{}');
+            data['main_obj'] = JSON.parse(data?.main_obj ?? '[]');
+            data['info_obj'] = JSON.parse(data?.info_obj ?? '[]');
+            data['program_info_obj'] = JSON.parse(data?.program_info_obj ?? '[]');
+            data['guide_obj'] = JSON.parse(data?.guide_obj ?? '[]');
 
             return response(req, res, 100, "success", data)
         } catch (err) {
@@ -62,17 +66,23 @@ const brandCtrl = {
             const decode_dns = checkDns(req.cookies.dns);
             const {
                 name, dns, og_description, company_name, business_num, pvcy_rep_name, ceo_name, addr, addr_detail, resident_num, phone_num, fax_num, note, theme_css = {}, setting_obj = {}, bizppurio_obj = {},
+                main_obj = [], info_obj = [], program_info_obj = [], guide_obj = [],
                 youtube_link, blog_link, kakao_link, phone_link,
                 user_name, user_pw
             } = req.body;
             let files = settingFiles(req.files);
             let obj = {
                 name, dns, og_description, company_name, business_num, pvcy_rep_name, ceo_name, addr, addr_detail, resident_num, phone_num, fax_num, note, theme_css, setting_obj, bizppurio_obj,
+                main_obj, info_obj, program_info_obj, guide_obj,
                 youtube_link, blog_link, kakao_link, phone_link,
             };
             obj['theme_css'] = JSON.stringify(obj.theme_css);
             obj['setting_obj'] = JSON.stringify(obj.setting_obj);
             obj['bizppurio_obj'] = JSON.stringify(obj.bizppurio_obj);
+            obj['main_obj'] = JSON.stringify(obj.main_obj);
+            obj['info_obj'] = JSON.stringify(obj.info_obj);
+            obj['program_info_obj'] = JSON.stringify(obj.program_info_obj);
+            obj['guide_obj'] = JSON.stringify(obj.guide_obj);
             obj = { ...obj, ...files };
             await db.beginTransaction();
 
@@ -106,6 +116,7 @@ const brandCtrl = {
             const decode_dns = checkDns(req.cookies.dns);
             const {
                 name, dns, og_description, company_name, business_num, pvcy_rep_name, ceo_name, addr, addr_detail, resident_num, phone_num, fax_num, note, theme_css = {}, setting_obj = {}, bizppurio_obj = {},
+                main_obj = [], info_obj = [], program_info_obj = [], guide_obj = [],
                 youtube_link, blog_link, kakao_link, phone_link,
             } = req.body;
             const { id } = req.params;
@@ -116,11 +127,16 @@ const brandCtrl = {
 
             let obj = {
                 name, dns, og_description, company_name, business_num, pvcy_rep_name, ceo_name, addr, addr_detail, resident_num, phone_num, fax_num, note, theme_css, setting_obj, bizppurio_obj,
+                main_obj, info_obj, program_info_obj, guide_obj,
                 youtube_link, blog_link, kakao_link, phone_link,
             };
             obj['theme_css'] = JSON.stringify(obj.theme_css);
             obj['setting_obj'] = JSON.stringify(obj.setting_obj);
             obj['bizppurio_obj'] = JSON.stringify(obj.bizppurio_obj);
+            obj['main_obj'] = JSON.stringify(obj.main_obj);
+            obj['info_obj'] = JSON.stringify(obj.info_obj);
+            obj['program_info_obj'] = JSON.stringify(obj.program_info_obj);
+            obj['guide_obj'] = JSON.stringify(obj.guide_obj);
             obj = { ...obj, ...files };
 
             let result = await updateQuery(`${table_name}`, obj, id);

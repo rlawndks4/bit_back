@@ -16,6 +16,10 @@ const domainCtrl = {
             brand['theme_css'] = JSON.parse(brand?.theme_css ?? '{}');
             brand['setting_obj'] = JSON.parse(brand?.setting_obj ?? '{}');
             brand['bizppurio_obj'] = JSON.parse(brand?.bizppurio_obj ?? '{}');
+            brand['main_obj'] = JSON.parse(brand?.main_obj ?? '[]');
+            brand['info_obj'] = JSON.parse(brand?.info_obj ?? '[]');
+            brand['program_info_obj'] = JSON.parse(brand?.program_info_obj ?? '[]');
+            brand['guide_obj'] = JSON.parse(brand?.guide_obj ?? '[]');
             const token = await makeUserToken(brand);
             res.cookie("dns", token, {
                 httpOnly: true,

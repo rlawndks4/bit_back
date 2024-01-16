@@ -186,6 +186,7 @@ export const imageFieldList = [
     'guide_banner_file',
     'post_2_banner_file',
     'post_3_banner_file',
+    'main_banner_file',
 
 ].map(field => {
     return {
