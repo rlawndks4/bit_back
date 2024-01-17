@@ -11,15 +11,42 @@ const domainCtrl = {
             if (dns == '127.0.0.1') {
                 dns = 'sety21.cafe24.com';
             }
-            let brand = await pool.query(`SELECT * FROM brands WHERE dns='${dns}'`);
+            let columns = [
+                `id`,
+                `name`,
+                `dns`,
+                `logo_img`,
+                `dark_logo_img`,
+                `favicon_img`,
+                `og_img`,
+                `og_description`,
+                `company_name`,
+                `business_num`,
+                `pvcy_rep_name`,
+                `ceo_name`,
+                `addr`,
+                `addr_detail`,
+                `resident_num`,
+                `phone_num`,
+                `fax_num`,
+                `theme_css`,
+                `setting_obj`,
+                `main_banner_img`,
+                `main_banner_text`,
+                `info_banner_img`,
+                `program_info_banner_img`,
+                `guide_banner_img`,
+                `post_2_banner_img`,
+                `post_3_banner_img`,
+                `youtube_link`,
+                `blog_link`,
+                `kakao_link`,
+                `phone_link`,
+            ]
+            let brand = await pool.query(`SELECT ${columns.join()} FROM brands WHERE dns='${dns}'`);
             brand = brand?.result[0];
             brand['theme_css'] = JSON.parse(brand?.theme_css ?? '{}');
             brand['setting_obj'] = JSON.parse(brand?.setting_obj ?? '{}');
-            brand['bizppurio_obj'] = JSON.parse(brand?.bizppurio_obj ?? '{}');
-            brand['main_obj'] = JSON.parse(brand?.main_obj ?? '[]');
-            brand['info_obj'] = JSON.parse(brand?.info_obj ?? '[]');
-            brand['program_info_obj'] = JSON.parse(brand?.program_info_obj ?? '[]');
-            brand['guide_obj'] = JSON.parse(brand?.guide_obj ?? '[]');
             const token = await makeUserToken(brand);
             res.cookie("dns", token, {
                 httpOnly: true,
