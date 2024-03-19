@@ -32,7 +32,6 @@ const domainCtrl = {
                 `theme_css`,
                 `setting_obj`,
                 `main_banner_img`,
-                `main_banner_text`,
                 `info_banner_img`,
                 `program_info_banner_img`,
                 `guide_banner_img`,
